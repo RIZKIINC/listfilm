@@ -114,29 +114,127 @@
       border-radius: 10px;
       margin-bottom: 1.5rem;
     }
+
+    /* Modal Styles */
+    .modal-content {
+      background: #2d2d2d;
+      border: 1px solid #404040;
+      border-radius: 12px;
+      overflow: hidden;
+    }
     
-    .synopsis {
+    .modal-header {
+      border-bottom: 1px solid #404040;
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.2);
+    }
+    
+    .modal-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .info-label {
+      font-weight: 500;
+      color: #adb5bd;
+      font-size: 0.95rem;
+    }
+    
+    .info-value {
+      font-weight: 400;
+      color: #fff;
+    }
+    
+    .synopsis-container {
+      margin-top: 1.5rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 1.25rem;
+      border: 1px solid #404040;
+    }
+    
+    .synopsis-title {
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #adb5bd;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .synopsis-title i {
+      color: var(--primary-color);
+    }
+    
+    .synopsis-content {
+      color: #e9ecef;
+      line-height: 1.7;
       max-height: 200px;
       overflow-y: auto;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.1);
-      border-radius: 5px;
-      margin-top: 15px;
+      padding-right: 10px;
+      font-size: 0.95rem;
+    }
+    
+    .synopsis-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .synopsis-content::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 3px;
+    }
+    
+    .badge-custom {
+      padding: 0.5rem 0.75rem;
+      font-weight: 500;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    
+    .anime-cover {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+    
+    .anime-cover:hover {
+      transform: scale(1.02);
     }
     
     @media (max-width: 768px) {
-      .card-title { 
-        font-size: 14px;
-        line-height: 1.3;
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
       }
-      .platform-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 10px;
+      
+      .modal-body {
+        padding: 1rem;
       }
-      .episode-indicator {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.4rem;
+      
+      .modal-title {
+        font-size: 1.25rem;
+      }
+      
+      .info-label, .synopsis-content {
+        font-size: 0.9rem;
+      }
+      
+      .badge-custom {
+        padding: 0.4rem 0.6rem;
       }
     }
   </style>
@@ -203,32 +301,35 @@
         </div>
         <div class="modal-body">
           <div class="row g-4">
-            <div class="col-12 col-md-6">
-              <div class="img-container rounded-3">
-                <img id="modalImage" class="card-img rounded-3" alt="Anime cover">
+            <div class="col-12 col-md-5">
+              <div class="img-container rounded-3 mb-3">
+                <img id="modalImage" class="card-img rounded-3 anime-cover" alt="Anime cover">
               </div>
             </div>
-            <div class="col-12 col-md-6">
-              <div class="d-flex flex-column gap-3">
-                <div>
-                  <h6>Total Season: <span class="badge bg-secondary" id="modalTotalSeason"></span></h6>
+            <div class="col-12 col-md-7">
+              <div class="info-grid">
+                <div class="info-label">Total Season:</div>
+                <div class="info-value"><span class="badge bg-secondary badge-custom" id="modalTotalSeason">-</span></div>
+                
+                <div class="info-label">Status:</div>
+                <div class="info-value"><span class="badge badge-custom" id="modalStatus">-</span></div>
+                
+                <div class="info-label">Current Season:</div>
+                <div class="info-value"><span class="badge bg-secondary badge-custom" id="modalCurrentSeason">-</span></div>
+                
+                <div class="info-label">Last Episode:</div>
+                <div class="info-value"><span class="badge bg-secondary badge-custom" id="modalCurrentEpisode">-</span></div>
+                
+                <div class="info-label">Last Watched:</div>
+                <div class="info-value"><span class="badge bg-secondary badge-custom" id="modalLastWatched">-</span></div>
+              </div>
+              
+              <div class="synopsis-container">
+                <div class="synopsis-title">
+                  <i class="fas fa-align-left"></i>
+                  <span>Sinopsis</span>
                 </div>
-                <div>
-                  <h6>Status: <span class="badge bg-warning" id="modalStatus"></span></h6>
-                </div>
-                <div>
-                  <h6>Season Saat Ini: <span class="badge bg-secondary" id="modalCurrentSeason"></span></h6>
-                </div>
-                <div>
-                  <h6>Episode Terakhir: <span class="badge bg-secondary" id="modalCurrentEpisode"></span></h6>
-                </div>
-                <div>
-                  <h6>Terakhir Ditonton: <span class="badge bg-secondary" id="modalLastWatched"></span></h6>
-                </div>
-                <div>
-                  <h6>Sinopsis:</h6>
-                  <div class="synopsis" id="modalSynopsis">-</div>
-                </div>
+                <div class="synopsis-content" id="modalSynopsis">-</div>
               </div>
             </div>
           </div>
