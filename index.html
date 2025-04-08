@@ -115,6 +115,15 @@
       margin-bottom: 1.5rem;
     }
     
+    .synopsis {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.1);
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    
     @media (max-width: 768px) {
       .card-title { 
         font-size: 14px;
@@ -216,6 +225,10 @@
                 <div>
                   <h6>Terakhir Ditonton: <span class="badge bg-secondary" id="modalLastWatched"></span></h6>
                 </div>
+                <div>
+                  <h6>Sinopsis:</h6>
+                  <div class="synopsis" id="modalSynopsis">-</div>
+                </div>
               </div>
             </div>
           </div>
@@ -258,7 +271,8 @@
               allData = results.data.map(item => ({
                 ...item,
                 Status: item.Status && item.Status.includes('Ongoing') ? 'Ongoing' : 'Completed',
-                lastWatched: item['Terakhir Ditonton'] || 'Belum ada data'
+                lastWatched: item['Terakhir Ditonton'] || 'Belum ada data',
+                Sinopsis: item.Sinopsis || '-'
               }));
               
               processData();
@@ -420,6 +434,7 @@
         document.getElementById('modalCurrentSeason').textContent = item['Season Sedang Nonton'] || '-';
         document.getElementById('modalCurrentEpisode').textContent = item['Episode Sedang Nonton'] || '-';
         document.getElementById('modalLastWatched').textContent = item.lastWatched || 'Belum ada data';
+        document.getElementById('modalSynopsis').textContent = item.Sinopsis || '-';
         
         const statusBadge = document.getElementById('modalStatus');
         statusBadge.className = 'badge ' + (item.Status === 'Ongoing' ? 'bg-warning' : 'bg-success');
