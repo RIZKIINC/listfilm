@@ -1,408 +1,393 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id" data-bs-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>Anime Tracking List</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=crunchyroll.com">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Anime Tracking List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    :root {
+      --card-bg: #2d2d2d;
+      --card-border: #404040;
+      --primary-color: #3a86ff;
+      --secondary-color: #8338ec;
+    }
     
-    <style>
-        :root {
-            --primary-color: #3a86ff;
-            --secondary-color: #8338ec;
-            --success-color: #06d6a0;
-            --warning-color: #ffbe0b;
-            --danger-color: #ef476f;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .anime-card {
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-        
-        .anime-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        
-        /* Container untuk gambar dengan rasio 3:4 */
-        .cover-container {
-            position: relative;
-            width: 100%;
-            padding-top: 133.33%; /* 4:3 Aspect Ratio */
-            overflow: hidden;
-            background-color: #f1f3f5;
-        }
-        
-        .cover-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .anime-card:hover .cover-img {
-            transform: scale(1.05);
-        }
-        
-        .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 2;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .card-title {
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: #212529;
-            min-height: 3rem;
-        }
-        
-        .list-group-item {
-            border: none;
-            padding: 0.5rem 0;
-            background-color: transparent;
-            color: #495057;
-        }
-        
-        .list-group-item i {
-            width: 20px;
-            text-align: center;
-            margin-right: 8px;
-            color: var(--primary-color);
-        }
-        
-        .search-box {
-            border-radius: 50px;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .filter-select {
-            border-radius: 50px;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 1.5rem center;
-            background-size: 1em;
-        }
-        
-        .input-group-text {
-            background-color: white;
-            border: none;
-            padding-left: 1.5rem;
-        }
-        
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .header {
-                padding: 1.5rem 0;
-            }
-            
-            .cover-container {
-                padding-top: 133.33%;
-            }
-            
-            .search-box, .filter-select {
-                padding: 0.5rem 1rem;
-            }
-        }
-    </style>
+    body {
+      background: #1a1a1a;
+      color: #e9ecef;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0 0 20px 20px;
+    }
+    
+    .card-custom {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100%;
+    }
+    
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .img-container {
+      position: relative;
+      padding-top: 133.33%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    
+    .card-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .status-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 2;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .platform-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .platform-icon.ongoing { background: #ffc107; }
+    .platform-icon.completed { background: #198754; }
+    
+    .count-badge {
+      background: #404040;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    
+    .filter-container {
+      background: #2d2d2d;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .card-title { 
+        font-size: 14px;
+        line-height: 1.3;
+      }
+      .platform-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1><i class="fas fa-tv me-3"></i> Anime Tracking List</h1>
-                    <p class="lead">Daftar anime yang sedang dan sudah ditonton</p>
-                </div>
-            </div>
+  <div class="header">
+    <div class="container py-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h2 class="mb-0"><i class="fas fa-tv me-2"></i> ANIME TRACKING LIST</h2>
+        <div class="d-flex gap-2">
+          <div class="count-badge">
+            Total Anime: <span id="animeCount">0</span>
+          </div>
+          <div class="count-badge">
+            Ongoing: <span id="ongoingCount">0</span>
+          </div>
         </div>
+      </div>
+      <p class="mb-0 mt-2">Daftar anime yang sedang dan sudah ditonton</p>
     </div>
-    
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col-lg-6 mb-3">
-                <div class="input-group shadow-sm">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchInput" class="form-control search-box" placeholder="Cari judul anime...">
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <select id="statusFilter" class="form-select filter-select">
-                    <option value="">Semua Status</option>
-                    <option value="Masih lanjut">Masih lanjut</option>
-                    <option value="Sudah tamat">Sudah tamat</option>
-                </select>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <select id="seasonFilter" class="form-select filter-select">
-                    <option value="">Semua Season</option>
-                    <!-- Options akan diisi oleh JavaScript -->
-                </select>
-            </div>
+  </div>
+
+  <div class="container py-3">
+    <div class="filter-container shadow-lg mb-4 p-3">
+      <div class="row g-2">
+        <div class="col-12 col-md-4">
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari judul anime...">
+          </div>
         </div>
-        
-        <div id="loadingSpinner" class="loading-spinner">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3">Memuat data anime...</p>
+        <div class="col-12 col-md-4">
+          <select id="statusFilter" class="form-select">
+            <option value="">Semua Status</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Completed">Completed</option>
+          </select>
         </div>
-        
-        <div id="noResults" class="no-results">
-            <i class="fas fa-tv fa-3x mb-3"></i>
-            <h4>Tidak ada anime yang ditemukan</h4>
-            <p>Coba gunakan kata kunci lain atau reset filter</p>
+        <div class="col-12 col-md-4">
+          <select id="seasonFilter" class="form-select">
+            <option value="">Semua Season</option>
+          </select>
         </div>
-        
-        <div id="animeList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4"></div>
+      </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Papa Parse untuk parsing CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Day.js untuk format tanggal -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.7/locale/id.min.js"></script>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-2" id="card-grid"></div>
     
-    <script>
-        // Konfigurasi Day.js
-        dayjs.locale('id');
-        
-        // URL Google Sheets CSV
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmlmRck6I6kwKfjeZCN7MapTP9YxGOoRIfa45RiSVS0cfUZh0WGDT99w4D2XcO6xjpW73NPgQczyCx/pub?output=csv';
-        
-        // Variabel global untuk menyimpan data
-        let animeData = [];
-        let uniqueSeasons = [];
-        
-        // Fungsi untuk memuat data
-        async function loadData() {
-            document.getElementById('loadingSpinner').style.display = 'block';
-            document.getElementById('animeList').innerHTML = '';
-            document.getElementById('noResults').style.display = 'none';
-            
-            try {
-                const response = await fetch(csvUrl);
-                const csvData = await response.text();
-                
-                Papa.parse(csvData, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        animeData = results.data.map(item => ({
-                            ...item,
-                            // Format tanggal yang konsisten
-                            lastWatched: dayjs(item['Terakhir Ditonton']).isValid() 
-                                ? dayjs(item['Terakhir Ditonton']) 
-                                : null
-                        }));
-                        
-                        // Ekstrak season unik untuk filter
-                        uniqueSeasons = [...new Set(animeData.map(item => item['Season Sedang Nonton']))].sort();
-                        populateSeasonFilter();
-                        
-                        renderAnimeCards(animeData);
-                        document.getElementById('loadingSpinner').style.display = 'none';
-                    },
-                    error: function(error) {
-                        console.error('Error parsing CSV:', error);
-                        document.getElementById('loadingSpinner').style.display = 'none';
-                        showError();
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('loadingSpinner').style.display = 'none';
-                showError();
-            }
-        }
-        
-        // Fungsi untuk menampilkan error
-        function showError() {
-            document.getElementById('animeList').innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
-                    <h4 class="text-danger">Gagal memuat data</h4>
-                    <p>Silakan coba refresh halaman atau cek koneksi internet Anda</p>
-                    <button class="btn btn-primary mt-3" onclick="loadData()">
-                        <i class="fas fa-sync-alt me-2"></i>Coba Lagi
-                    </button>
+    <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Memuat data anime...</p>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle"></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <div class="img-container rounded-3">
+                <img id="modalImage" class="card-img rounded-3" alt="Anime cover">
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="d-flex flex-column gap-3">
+                <div>
+                  <h6>Total Season: <span class="badge bg-secondary" id="modalTotalSeason"></span></h6>
                 </div>
-            `;
-        }
+                <div>
+                  <h6>Status: <span class="badge bg-warning" id="modalStatus"></span></h6>
+                </div>
+                <div>
+                  <h6>Season Saat Ini: <span class="badge bg-secondary" id="modalCurrentSeason"></span></h6>
+                </div>
+                <div>
+                  <h6>Episode Terakhir: <span class="badge bg-secondary" id="modalCurrentEpisode"></span></h6>
+                </div>
+                <div>
+                  <h6>Terakhir Ditonton: <span class="badge bg-secondary" id="modalLastWatched"></span></h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmlmRck6I6kwKfjeZCN7MapTP9YxGOoRIfa45RiSVS0cfUZh0WGDT99w4D2XcO6xjpW73NPgQczyCx/pub?output=csv';
+      let allData = [];
+      let currentData = [];
+
+      const elements = {
+        searchInput: document.getElementById('searchInput'),
+        statusFilter: document.getElementById('statusFilter'),
+        seasonFilter: document.getElementById('seasonFilter'),
+        cardGrid: document.getElementById('card-grid'),
+        animeCount: document.getElementById('animeCount'),
+        ongoingCount: document.getElementById('ongoingCount'),
+        loadingSpinner: document.getElementById('loadingSpinner')
+      };
+
+      // Load initial data
+      loadData();
+
+      async function loadData() {
+        elements.loadingSpinner.style.display = 'block';
         
-        // Fungsi untuk mengisi filter season
-        function populateSeasonFilter() {
-            const seasonFilter = document.getElementById('seasonFilter');
-            // Kosongkan dulu option yang ada
-            seasonFilter.innerHTML = '<option value="">Semua Season</option>';
-            
-            uniqueSeasons.forEach(season => {
-                if (season) { // Pastikan season tidak kosong
-                    const option = document.createElement('option');
-                    option.value = season;
-                    option.textContent = season;
-                    seasonFilter.appendChild(option);
-                }
-            });
-        }
-        
-        // Fungsi untuk merender kartu anime
-        function renderAnimeCards(data) {
-            const container = document.getElementById('animeList');
-            
-            if (data.length === 0) {
-                document.getElementById('noResults').style.display = 'block';
-                container.innerHTML = '';
-                return;
+        try {
+          const response = await fetch(csvUrl);
+          const csvData = await response.text();
+          
+          Papa.parse(csvData, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+              allData = results.data.map(item => ({
+                ...item,
+                // Fixed status mapping
+                Status: item.Status && item.Status.includes('Ongoing') ? 'Ongoing' : 'Completed',
+                // Ensure last watched date is included
+                lastWatched: item['Terakhir Ditonton'] || 'Belum ada data'
+              }));
+              
+              processData();
+              elements.loadingSpinner.style.display = 'none';
+            },
+            error: function(error) {
+              console.error('Error parsing CSV:', error);
+              elements.loadingSpinner.style.display = 'none';
+              showError();
             }
-            
-            container.innerHTML = '';
-            
-            data.forEach(item => {
-                // Format tanggal
-                const lastWatched = item.lastWatched 
-                    ? item.lastWatched.format('D MMMM YYYY') 
-                    : 'Belum ada data';
-                
-                const card = `
-                    <div class="col">
-                        <div class="card anime-card h-100">
-                            <div class="cover-container">
-                                <img src="${item.Cover || 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/800px-No-Image-Placeholder.svg.png'}" 
-                                     class="cover-img" 
-                                     alt="${item['Judul Anime']}"
-                                     onerror="this.src='https://via.placeholder.com/300x400?text=No+Cover'">
-                                <div class="status-badge bg-${item.Status === 'Masih lanjut' ? 'warning' : 'success'}">
-                                    <i class="fas ${item.Status === 'Masih lanjut' ? 'fa-spinner' : 'fa-check-circle'} me-1"></i>
-                                    ${item.Status}
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">${item['Judul Anime']}</h5>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <i class="fas fa-layer-group"></i>
-                                        <strong>Total Season:</strong> ${item['Jumlah Season'] || '-'}
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-play-circle"></i>
-                                        <strong>Season Saat Ini:</strong> ${item['Season Sedang Nonton'] || '-'}
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-film"></i>
-                                        <strong>Episode Terakhir:</strong> ${item['Episode Sedang Nonton'] || '-'}
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        <strong>Terakhir Ditonton:</strong> ${lastWatched}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
+          });
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          elements.loadingSpinner.style.display = 'none';
+          showError();
         }
+      }
+
+      function showError() {
+        elements.cardGrid.innerHTML = `
+          <div class="col-12 text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+            <h4 class="text-danger">Gagal memuat data</h4>
+            <p>Silakan coba refresh halaman atau cek koneksi internet Anda</p>
+            <button class="btn btn-primary mt-3" onclick="location.reload()">
+              <i class="fas fa-sync-alt me-2"></i>Coba Lagi
+            </button>
+          </div>
+        `;
+      }
+
+      function processData() {
+        const uniqueSeasons = [...new Set(allData.map(item => item['Season Sedang Nonton']))].sort();
+        populateSeasonFilter(uniqueSeasons);
+        currentData = [...allData];
+        renderCards();
+        updateCounts();
+        setupFilters();
+      }
+
+      function populateSeasonFilter(seasons) {
+        const seasonFilter = elements.seasonFilter;
+        seasonFilter.innerHTML = '<option value="">Semua Season</option>';
         
-        // Fungsi untuk setup filter dan pencarian
-        function setupFilters() {
-            const searchInput = document.getElementById('searchInput');
-            const statusFilter = document.getElementById('statusFilter');
-            const seasonFilter = document.getElementById('seasonFilter');
-            
-            function filterCards() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const statusValue = statusFilter.value;
-                const seasonValue = seasonFilter.value;
-                
-                const filtered = animeData.filter(item => {
-                    const matchesSearch = item['Judul Anime'].toLowerCase().includes(searchTerm);
-                    const matchesStatus = statusValue ? item.Status === statusValue : true;
-                    const matchesSeason = seasonValue ? item['Season Sedang Nonton'] === seasonValue : true;
-                    
-                    return matchesSearch && matchesStatus && matchesSeason;
-                });
-                
-                renderAnimeCards(filtered);
-            }
-            
-            searchInput.addEventListener('input', filterCards);
-            statusFilter.addEventListener('change', filterCards);
-            seasonFilter.addEventListener('change', filterCards);
-            
-            // Reset filter
-            document.getElementById('resetFilters').addEventListener('click', function() {
-                searchInput.value = '';
-                statusFilter.value = '';
-                seasonFilter.value = '';
-                filterCards();
-            });
-        }
-        
-        // Inisialisasi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            setupFilters();
+        seasons.forEach(season => {
+          if (season) {
+            const option = document.createElement('option');
+            option.value = season;
+            option.textContent = `Season ${season}`;
+            seasonFilter.appendChild(option);
+          }
         });
-    </script>
+      }
+
+      function renderCards() {
+        if (currentData.length === 0) {
+          elements.cardGrid.innerHTML = `
+            <div class="col-12 text-center py-5">
+              <i class="fas fa-tv fa-3x mb-3"></i>
+              <h4>Tidak ada anime yang ditemukan</h4>
+              <p>Coba gunakan kata kunci lain atau reset filter</p>
+            </div>
+          `;
+          return;
+        }
+        
+        elements.cardGrid.innerHTML = currentData.map(item => `
+          <div class="col">
+            <div class="card card-custom position-relative">
+              <div class="status-indicator">
+                ${getStatusBadge(item.Status)}
+              </div>
+              <div class="img-container" onclick="showModal(${JSON.stringify(item).replace(/"/g, "'")})">
+                <img src="${item.Cover || 'https://placehold.co/600x800/2d2d2d/FFF?text=No+Cover'}" 
+                     class="card-img"
+                     onerror="this.src='https://placehold.co/600x800/2d2d2d/FFF?text=No+Cover'">
+              </div>
+              <div class="card-body p-2">
+                <h6 class="card-title text-truncate mb-1">${item['Judul Anime']}</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">S${item['Season Sedang Nonton'] || '?'} • E${item['Episode Sedang Nonton'] || '?'}</small>
+                  <div class="d-flex gap-1">
+                    ${getStatusIcon(item.Status)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function getStatusBadge(status) {
+        const statusClass = status === 'Ongoing' ? 'ongoing' : 'completed';
+        const statusIcon = status === 'Ongoing' ? 'fa-spinner' : 'fa-check-circle';
+        
+        return `
+          <span class="platform-icon ${statusClass}" 
+                data-bs-toggle="tooltip" 
+                title="${status}">
+            <i class="fas ${statusIcon}"></i>
+          </span>
+        `;
+      }
+
+      function getStatusIcon(status) {
+        return status === 'Ongoing' 
+          ? '<i class="fas fa-spinner text-warning"></i>' 
+          : '<i class="fas fa-check-circle text-success"></i>';
+      }
+
+      function updateCounts() {
+        elements.animeCount.textContent = currentData.length;
+        elements.ongoingCount.textContent = currentData.filter(item => item.Status === 'Ongoing').length;
+      }
+
+      function setupFilters() {
+        elements.searchInput.addEventListener('input', filterCards);
+        elements.statusFilter.addEventListener('change', filterCards);
+        elements.seasonFilter.addEventListener('change', filterCards);
+      }
+
+      function filterCards() {
+        const filters = {
+          search: elements.searchInput.value.toLowerCase(),
+          status: elements.statusFilter.value,
+          season: elements.seasonFilter.value
+        };
+
+        currentData = allData.filter(item => 
+          item['Judul Anime'].toLowerCase().includes(filters.search) &&
+          (!filters.status || item.Status === filters.status) &&
+          (!filters.season || item['Season Sedang Nonton'] === filters.season)
+        );
+
+        renderCards();
+        updateCounts();
+      }
+
+      window.showModal = (item) => {
+        document.getElementById('modalTitle').textContent = item['Judul Anime'];
+        document.getElementById('modalImage').src = item.Cover || 'https://placehold.co/600x800/2d2d2d/FFF?text=No+Cover';
+        document.getElementById('modalTotalSeason').textContent = item['Jumlah Season'] || '-';
+        document.getElementById('modalStatus').textContent = item.Status || '-';
+        document.getElementById('modalCurrentSeason').textContent = item['Season Sedang Nonton'] || '-';
+        document.getElementById('modalCurrentEpisode').textContent = item['Episode Sedang Nonton'] || '-';
+        document.getElementById('modalLastWatched').textContent = item.lastWatched || 'Belum ada data';
+        
+        const statusBadge = document.getElementById('modalStatus');
+        statusBadge.className = 'badge ' + (item.Status === 'Ongoing' ? 'bg-warning' : 'bg-success');
+
+        new bootstrap.Modal('#infoModal').show();
+      };
+    });
+  </script>
 </body>
 </html>
