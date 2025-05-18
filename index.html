@@ -125,7 +125,6 @@
       font-weight: 500;
     }
 
-    /* Modal Styles */
     .modal-content {
       background: #2d2d2d;
       border: 1px solid #404040;
@@ -289,6 +288,21 @@
           </select>
         </div>
       </div>
+      <div class="row g-2 mt-2">
+        <div class="col-12 col-md-6">
+          <select id="sortOrder" class="form-select">
+            <option value="az">Urutkan A-Z</option>
+            <option value="za">Urutkan Z-A</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-6">
+          <select id="statusSort" class="form-select">
+            <option value="none">Urutkan berdasarkan Status</option>
+            <option value="ongoing">Ongoing Pertama</option>
+            <option value="completed">Completed Pertama</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-2" id="card-grid"></div>
@@ -359,6 +373,8 @@
         searchInput: document.getElementById('searchInput'),
         statusFilter: document.getElementById('statusFilter'),
         seasonFilter: document.getElementById('seasonFilter'),
+        sortOrder: document.getElementById('sortOrder'),
+        statusSort: document.getElementById('statusSort'),
         cardGrid: document.getElementById('card-grid'),
         animeCount: document.getElementById('animeCount'),
         ongoingCount: document.getElementById('ongoingCount'),
@@ -518,13 +534,17 @@
         elements.searchInput.addEventListener('input', filterCards);
         elements.statusFilter.addEventListener('change', filterCards);
         elements.seasonFilter.addEventListener('change', filterCards);
+        elements.sortOrder.addEventListener('change', filterCards);
+        elements.statusSort.addEventListener('change', filterCards);
       }
 
       function filterCards() {
         const filters = {
           search: elements.searchInput.value.toLowerCase(),
           status: elements.statusFilter.value,
-          season: elements.seasonFilter.value
+          season: elements.seasonFilter.value,
+          sortOrder: elements.sortOrder.value,
+          statusSort: elements.statusSort.value
         };
 
         currentData = allData.filter(item => 
@@ -532,6 +552,25 @@
           (!filters.status || item.Status === filters.status) &&
           (!filters.season || item['Season Sedang Nonton'] === filters.season)
         );
+
+        // Apply sorting
+        currentData.sort((a, b) => {
+          // Status sorting
+          if (filters.statusSort === 'ongoing') {
+            if (a.Status === 'Ongoing' && b.Status !== 'Ongoing') return -1;
+            if (b.Status === 'Ongoing' && a.Status !== 'Ongoing') return 1;
+          } else if (filters.statusSort === 'completed') {
+            if (a.Status === 'Completed' && b.Status !== 'Completed') return -1;
+            if (b.Status === 'Completed' && a.Status !== 'Completed') return 1;
+          }
+
+          // Title sorting
+          const titleA = a['Judul Anime'].toLowerCase();
+          const titleB = b['Judul Anime'].toLowerCase();
+          return filters.sortOrder === 'az' 
+            ? titleA.localeCompare(titleB)
+            : titleB.localeCompare(titleA);
+        });
 
         renderCards();
         updateCounts();
