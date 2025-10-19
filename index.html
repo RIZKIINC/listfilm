@@ -78,6 +78,15 @@
       width:100%; height:100%; object-fit:cover; display:block;
       transition:opacity .2s ease;
     }
+
+    #stats {
+      color: #9fb3d9;
+    }
+    #stats i {
+      color: #e6eef8;
+    }
+
+
     .cover-wrap:hover img{ opacity:0.85; }
 
     .card-body{ padding-top:.6rem; }
@@ -131,6 +140,11 @@
         <div class="small-muted"><i class="fa-regular fa-calendar"></i> <span id="lastUpdated">—</span></div>
         <button id="refreshBtn" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
       </div>
+    </div>
+
+    <div id="stats" class="small-muted mb-2">
+      <i class="fa-solid fa-database"></i> Total: <span id="totalCount">0</span> anime · 
+      <i class="fa-solid fa-play"></i> Ongoing: <span id="ongoingCount">0</span>
     </div>
 
     <main>
@@ -288,9 +302,20 @@
     }
 
     function applyFiltersAndRender(){
-      let data=[...rawData];
-      if(currentFilter!=='all') data=data.filter(r=>r['Status'].toLowerCase()===currentFilter.toLowerCase());
-      if(currentQuery.trim()) data=data.filter(r=>r['Judul Anime'].toLowerCase().includes(currentQuery.toLowerCase()));
+      let data = [...rawData];
+      if (currentFilter !== 'all') 
+        data = data.filter(r => r['Status'].toLowerCase() === currentFilter.toLowerCase());
+      if (currentQuery.trim()) 
+        data = data.filter(r => r['Judul Anime'].toLowerCase().includes(currentQuery.toLowerCase()));
+
+      // Hitung total dan ongoing
+      const total = rawData.length;
+      const ongoing = rawData.filter(r => (r['Status'] || '').toLowerCase() === 'ongoing').length;
+
+      // Update tampilan jumlah
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('ongoingCount').textContent = ongoing;
+
       renderGrid(data);
     }
 
