@@ -47,6 +47,12 @@
       background:linear-gradient(135deg,#ff8a00,#e52e71);
       display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
     }
+    #readMoreBtn {
+      font-size: 0.85rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+    }
+
 
     /* Responsif modal untuk mobile */
     @media (max-width: 576px) {
@@ -229,7 +235,8 @@
             <p class="small-muted mb-1"><i class="fa-regular fa-calendar"></i> Terakhir ditonton: <span id="modalLastWatched"></span></p>
             <p class="small-muted mb-2"><i class="fa-solid fa-list-ol"></i> Season: <span id="modalSeasons"></span> · Status: <span id="modalStatus"></span></p>
             <h6>Sinopsis</h6>
-            <p id="modalSynopsis" style="color:#dbeeff;"></p>
+            <p id="modalSynopsis" style="color:#dbeeff; white-space:pre-line;"></p>
+            <button id="readMoreBtn" class="btn btn-sm btn-outline-light mt-2 d-none">Baca selengkapnya</button>
           </div>
         </div>
       </div>
@@ -257,6 +264,8 @@
     const modalLastWatched = document.getElementById('modalLastWatched');
     const modalSeasons = document.getElementById('modalSeasons');
     const modalStatus = document.getElementById('modalStatus');
+
+    const readMoreBtn = document.getElementById('readMoreBtn');
 
     // Placeholder SVG (base64 encoded)
     const PLACEHOLDER_SVG = 'data:image/svg+xml;utf8,' +
@@ -340,14 +349,36 @@
       `;
 
       card.querySelector('.cover-wrap').addEventListener('click', () => {
-        modalTitle.textContent = title;
-        modalCover.src = cover || PLACEHOLDER_SVG;
-        modalSynopsis.textContent = sinopsis;
-        modalLastWatched.textContent = lastWatched;
-        modalSeasons.textContent = seasons;
-        modalStatus.textContent = status;
-        detailModal.show();
-      });
+      modalTitle.textContent = title;
+      modalCover.src = cover || PLACEHOLDER_SVG;
+
+      const fullText = item['Sinopsis'] || 'Tidak ada sinopsis.';
+      const shortText = fullText.length > 400 ? fullText.substring(0, 400).trim() + '...' : fullText;
+
+      modalSynopsis.textContent = shortText;
+
+      // Tampilkan tombol hanya jika sinopsis panjang
+      if (fullText.length > 400) {
+        readMoreBtn.classList.remove('d-none');
+        let expanded = false;
+
+        readMoreBtn.textContent = 'Baca selengkapnya';
+        readMoreBtn.onclick = () => {
+          expanded = !expanded;
+          modalSynopsis.textContent = expanded ? fullText : shortText;
+          readMoreBtn.textContent = expanded ? 'Tutup' : 'Baca selengkapnya';
+        };
+      } else {
+        readMoreBtn.classList.add('d-none');
+      }
+
+      modalLastWatched.textContent = lastWatched;
+      modalSeasons.textContent = seasons;
+      modalStatus.textContent = status;
+
+      detailModal.show();
+    });
+
 
       return card;
     }
