@@ -355,7 +355,7 @@
       const fullText = item['Sinopsis'] || 'Tidak ada sinopsis.';
       const shortText = fullText.length > 400 ? fullText.substring(0, 400).trim() + '...' : fullText;
 
-      modalSynopsis.textContent = shortText;
+      modalSynopsis.innerHTML = shortText.replace(/<br\s*\/?>/gi, '<br><br>');
 
       // Tampilkan tombol hanya jika sinopsis panjang
       if (fullText.length > 400) {
@@ -365,7 +365,7 @@
         readMoreBtn.textContent = 'Baca selengkapnya';
         readMoreBtn.onclick = () => {
           expanded = !expanded;
-          modalSynopsis.textContent = expanded ? fullText : shortText;
+          modalSynopsis.innerHTML = (expanded ? fullText : shortText).replace(/<br\s*\/?>/gi, '<br><br>');
           readMoreBtn.textContent = expanded ? 'Tutup' : 'Baca selengkapnya';
         };
       } else {
