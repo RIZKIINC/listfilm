@@ -316,6 +316,9 @@
       document.getElementById('totalCount').textContent = total;
       document.getElementById('ongoingCount').textContent = ongoing;
 
+      data.reverse();
+      renderGrid(data);
+
       renderGrid(data);
     }
 
