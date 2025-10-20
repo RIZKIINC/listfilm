@@ -48,13 +48,70 @@
       display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
     }
 
+    /* Responsif modal untuk mobile */
+    @media (max-width: 576px) {
+      .modal-dialog {
+        margin: 1rem;
+        max-width: 100%;
+      }
+
+      .modal-body {
+        flex-direction: column !important;
+        align-items: center;
+        text-align: center;
+      }
+
+      .modal-body .cover-wrap {
+        width: 100%;
+        max-width: 240px;
+        margin-bottom: 1rem;
+      }
+
+      #modalTitle {
+        font-size: 1.1rem;
+        text-align: center;
+        width: 100%;
+      }
+
+      #modalSynopsis {
+        font-size: .9rem;
+        line-height: 1.45;
+        text-align: left;
+      }
+
+      .modal-content {
+        border-radius: 12px;
+      }
+    }
+
+
     .headline{ font-size:1.25rem; color:#f8fafc; }
     .subhead{ color:var(--muted); font-size:.95rem; }
 
     .controls{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin:1rem 0 1.5rem; }
     .search-input{ min-width:220px; max-width:480px; flex:1 1 360px; }
 
-    .grid{ display:grid; gap:var(--card-gap); grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+    .grid{ 
+      display:grid; 
+      gap:var(--card-gap); 
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); 
+    }
+
+    /* Mobile layout: 2 card per baris */
+    @media (max-width: 576px){
+      .grid{
+        grid-template-columns: repeat(2, 1fr);
+        gap: .75rem;
+      }
+
+      .anime-card{
+        padding: .6rem;
+      }
+
+      .title{
+        font-size: .9rem;
+      }
+    }
 
     .anime-card{
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -253,7 +310,10 @@
 
       const title = item['Judul Anime'] || 'Tanpa Judul';
       const status = item['Status'] || 'Tidak Diketahui';
-      const sinopsis = item['Sinopsis'] || 'Tidak ada sinopsis.';
+      let sinopsis = item['Sinopsis'] || 'Tidak ada sinopsis.';
+      if (sinopsis.length > 400) {
+        sinopsis = sinopsis.substring(0, 400).trim() + '...';
+      }
       const seasons = item['Jumlah Season'] || '-';
       const seasonNow = item['Season Sedang Nonton'] || '-';
       const episodeNow = item['Episode Sedang Nonton'] || '-';
