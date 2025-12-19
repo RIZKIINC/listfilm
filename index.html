@@ -1,9 +1,14 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-bs-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Monitoring Anime — My List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Anime Monitor V2</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,245 +17,405 @@
   <!-- PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-  <!-- Favicon -->
-  <link rel="icon" href='data:image/svg+xml;utf8,
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <defs>
-      <linearGradient id="g" x1="0" x2="1">
-        <stop offset="0" stop-color="%23ff8a00"/>
-        <stop offset="1" stop-color="%23e52e71"/>
-      </linearGradient>
-    </defs>
-    <rect width="100" height="100" rx="18" fill="%230f1724"/>
-    <path d="M10 50 C30 20 70 20 90 50 C70 80 30 80 10 50 Z" fill="white"/>
-    <circle cx="50" cy="50" r="20" fill="url(%23g)"/>
-    <circle cx="58" cy="44" r="6" fill="rgba(255,255,255,0.9)"/>
-  </svg>'>
+  <!-- Favicon Generated -->
+  <link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%236366f1"/><path d="M30 50 L50 70 L80 30" stroke="white" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
 
   <style>
-    :root{
-      --card-gap: 1rem;
-      --muted: #6c757d;
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #ec4899;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --blur-strength: 12px;
     }
 
-    body{
-      background: linear-gradient(180deg,#0f1724 0%, #071028 100%);
-      color: #e6eef8;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      padding: 2rem 1rem;
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: .8rem;
-      margin-top: 3rem;
-    }
-
-    .app-shell{ max-width:1200px; margin:0 auto; }
-
-    .brand{ display:flex; gap:.75rem; align-items:center; margin-bottom:1rem; }
-    .brand .logo{ width:44px;height:44px;border-radius:10px;
-      background:linear-gradient(135deg,#ff8a00,#e52e71);
-      display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
-    }
-    #readMoreBtn {
-      font-size: 0.85rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
+    body {
+      background-color: var(--bg-dark);
+      /* Background Pattern yang halus */
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      padding-bottom: 4rem;
     }
 
+    /* Scrollbar Kustom */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Responsif modal untuk mobile */
+    /* --- Header & Controls --- */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(var(--blur-strength));
+      -webkit-backdrop-filter: blur(var(--blur-strength));
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .brand-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: grid; place-items: center;
+      color: white; font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .search-container {
+      position: relative;
+    }
+    .search-input {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+      color: white;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      color: white;
+    }
+    .search-icon {
+      position: absolute; left: 1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .clear-icon {
+      position: absolute; right: 1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      cursor: pointer;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .search-input:not(:placeholder-shown) ~ .clear-icon {
+      opacity: 1; pointer-events: auto;
+    }
+
+    /* --- Cards --- */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
     @media (max-width: 576px) {
-      .modal-dialog {
-        margin: 1rem;
-        max-width: 100%;
-      }
-
-      .modal-body {
-        flex-direction: column !important;
-        align-items: center;
-        text-align: center;
-      }
-
-      .modal-body .cover-wrap {
-        width: 100%;
-        max-width: 240px;
-        margin-bottom: 1rem;
-      }
-
-      #modalTitle {
-        font-size: 1.1rem;
-        text-align: center;
-        width: 100%;
-      }
-
-      #modalSynopsis {
-        font-size: .9rem;
-        line-height: 1.45;
-        text-align: left;
-      }
-
-      .modal-content {
-        border-radius: 12px;
-      }
-    }
-
-
-    .headline{ font-size:1.25rem; color:#f8fafc; }
-    .subhead{ color:var(--muted); font-size:.95rem; }
-
-    .controls{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin:1rem 0 1.5rem; }
-    .search-input{ min-width:220px; max-width:480px; flex:1 1 360px; }
-
-    .grid{ 
-      display:grid; 
-      gap:var(--card-gap); 
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); 
-    }
-
-    /* Mobile layout: 2 card per baris */
-    @media (max-width: 576px){
-      .grid{
+      .grid-container {
         grid-template-columns: repeat(2, 1fr);
-        gap: .75rem;
-      }
-
-      .anime-card{
-        padding: .6rem;
-      }
-
-      .title{
-        font-size: .9rem;
+        gap: 0.75rem;
       }
     }
 
-    .anime-card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.04);
-      padding:.8rem;
-      border-radius:12px;
-      transition: transform .12s ease, box-shadow .12s ease;
+    .anime-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
-    .anime-card:hover{ transform:translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.6); }
-
-    .cover-wrap{
-      width:100%;
-      aspect-ratio:2/3;
-      background:#0b1220;
-      border-radius:8px;
-      overflow:hidden;
-      cursor:pointer;
-      position:relative;
-    }
-    .cover-wrap img{
-      width:100%; height:100%; object-fit:cover; display:block;
-      transition:opacity .2s ease;
+    .anime-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      border-color: rgba(99, 102, 241, 0.3);
     }
 
-    #stats {
-      color: #9fb3d9;
+    .card-img-wrapper {
+      position: relative;
+      aspect-ratio: 2/3;
+      overflow: hidden;
+      cursor: pointer;
     }
-    #stats i {
-      color: #e6eef8;
+    .card-img-wrapper img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .anime-card:hover .card-img-wrapper img {
+      transform: scale(1.05);
+    }
+    .card-badge {
+      position: absolute; top: 10px; right: 10px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .status-ongoing { background: rgba(16, 185, 129, 0.9); color: white; }
+    .status-finished { background: rgba(100, 116, 139, 0.9); color: white; }
+
+    .card-content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: auto; /* Push to bottom */
+    }
+    .progress-pill {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #e2e8f0;
+    }
+    .progress-pill i { color: var(--primary); }
+
+    /* --- Skeleton Loading --- */
+    .skeleton {
+      background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-card {
+      aspect-ratio: 2/3.5;
+      border-radius: 16px;
     }
 
-
-    .cover-wrap:hover img{ opacity:0.85; }
-
-    .card-body{ padding-top:.6rem; }
-    .title{ font-weight:600; font-size:1rem; color:#e6eef8; display:block; line-height:1.2; min-height:2.6em; overflow:hidden; }
-    .meta{ font-size:.85rem; color:var(--muted); margin-top:.45rem; display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
-
-    .badge-status{
-      padding:.25rem .5rem; border-radius:999px; font-weight:600; font-size:.78rem; color:white;
+    /* --- Modal Customization --- */
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
     }
-    .status-ongoing{ background:linear-gradient(90deg,#12b886,#2dd4bf); }
-    .status-finished{ background:linear-gradient(90deg,#64748b,#94a3b8); }
+    .modal-header { border-bottom: 1px solid var(--border-color); }
+    .modal-footer { border-top: 1px solid var(--border-color); }
+    .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
+    
+    .modal-cover {
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 250px;
+    }
 
-    .progress-line{ margin-top:.7rem; }
-    .progress-text{ font-size:.86rem; color:#dcefff; font-weight:600; }
-    .small-muted{ color:#9fb3d9; font-size:.82rem; }
+    /* --- Toast & Utilities --- */
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1055; }
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+    }
 
-    .empty{ text-align:center; color:var(--muted); padding:3rem 1rem; border-radius:10px; background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent); }
-
-    @media (max-width:576px){ .brand h1{font-size:1rem;} .subhead{font-size:.85rem;} }
+    .btn-glass {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+    .btn-glass:hover, .btn-glass.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <div class="brand">
-      <div class="logo"><i class="fa-solid fa-eye"></i></div>
-      <div>
-        <div class="headline">Anime Monitor</div>
-        <div class="subhead">Daftar anime yang sedang Anda tonton</div>
+
+  <!-- Header Sticky -->
+  <header class="sticky-header">
+    <div class="container-xl">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        
+        <!-- Brand -->
+        <div class="d-flex align-items-center gap-2">
+          <div class="brand-logo"><i class="fa-solid fa-ghost"></i></div>
+          <div>
+            <h5 class="m-0 fw-bold">Anime Monitor</h5>
+            <small class="text-muted" style="font-size: 0.75rem;">List v2.0</small>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-grow-1 mx-md-4 position-relative" style="max-width: 500px;">
+          <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" class="form-control search-input" placeholder="Cari judul anime...">
+            <i class="fa-solid fa-xmark clear-icon" id="clearSearch"></i>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+           <div class="dropdown">
+            <button class="btn btn-glass dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-arrow-down-short-wide"></i> <span class="d-none d-sm-inline" id="sortLabel">Terbaru</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark shadow-lg">
+              <li><a class="dropdown-item sort-opt" data-sort="latest" href="#">🕒 Terakhir Ditonton</a></li>
+              <li><a class="dropdown-item sort-opt" data-sort="az" href="#">🔤 Judul (A-Z)</a></li>
+              <li><a class="dropdown-item sort-opt" data-sort="za" href="#">🔤 Judul (Z-A)</a></li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-glass dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-filter"></i> <span class="d-none d-sm-inline" id="filterLabel">Semua</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark shadow-lg">
+              <li><a class="dropdown-item filter-opt" data-filter="all" href="#">Semua Status</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item filter-opt" data-filter="ongoing" href="#">🟢 Ongoing</a></li>
+              <li><a class="dropdown-item filter-opt" data-filter="selesai" href="#">⚪ Selesai</a></li>
+            </ul>
+          </div>
+
+          <button id="refreshBtn" class="btn btn-glass" title="Refresh Data">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+
       </div>
     </div>
+  </header>
 
-    <div class="controls">
-      <div class="input-group search-input">
-        <span class="input-group-text bg-transparent border-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
-        <input id="search" class="form-control form-control-dark" type="search" placeholder="Cari judul anime..." aria-label="Search">
-        <button id="clearSearch" class="btn btn-outline-light" title="Clear"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn btn-outline-light dropdown-toggle" id="filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fa-solid fa-filter"></i> Status: <span id="filterLabel">Semua</span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterBtn">
-          <li><a class="dropdown-item filter-item" data-filter="all" href="#">Semua</a></li>
-          <li><a class="dropdown-item filter-item" data-filter="Ongoing" href="#">Ongoing</a></li>
-          <li><a class="dropdown-item filter-item" data-filter="Selesai" href="#">Selesai</a></li>
-        </ul>
-      </div>
-
-      <div class="ms-auto d-flex gap-2 align-items-center">
-        <div class="small-muted"><i class="fa-regular fa-calendar"></i> <span id="lastUpdated">—</span></div>
-        <button id="refreshBtn" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
-      </div>
-    </div>
-
-    <div id="stats" class="small-muted mb-2">
-      <i class="fa-solid fa-database"></i> Total: <span id="totalCount">0</span> anime · 
-      <i class="fa-solid fa-play"></i> Ongoing: <span id="ongoingCount">0</span>
-    </div>
-
-    <main>
-      <div id="grid" class="grid"></div>
-      <div id="empty" class="empty mt-4 d-none">
-        <div><i class="fa-regular fa-face-sad-tear fa-2x"></i></div>
-        <div class="mt-2">Tidak ada anime yang sesuai.</div>
-      </div>
-    </main>
+  <!-- Main Content -->
+  <main class="container-xl">
     
-    <footer class="text-center small-muted mt-4">
-      <hr style="opacity:.1;">
-      <div id="version">v1.0.0</div>
-    </footer>
+    <!-- Stats Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+      <div class="text-muted small">
+        <i class="fa-solid fa-database me-1"></i> Total: <b class="text-white" id="totalCount">0</b>
+        <span class="mx-2">•</span>
+        <span class="text-success"><i class="fa-solid fa-play me-1"></i> Ongoing: <b id="ongoingCount">0</b></span>
+      </div>
+      <div class="text-muted small fst-italic">
+        Updated: <span id="lastUpdated">-</span>
+      </div>
+    </div>
 
-  </div>
+    <!-- Grid -->
+    <div id="grid" class="grid-container">
+      <!-- Content injected by JS -->
+    </div>
+    
+    <!-- Load More Button -->
+    <div id="loadMoreContainer" class="text-center mt-5 mb-4 d-none">
+      <button id="loadMoreBtn" class="btn btn-glass px-4 py-2 rounded-pill shadow-sm">
+        Lihat Lainnya <i class="fa-solid fa-chevron-down ms-2" style="font-size:0.8rem"></i>
+      </button>
+      <div class="text-muted small mt-2">
+        Menampilkan <span id="showingCount">0</span> dari <span id="totalVisibleCount">0</span>
+      </div>
+    </div>
 
-  <!-- Modal -->
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state d-none">
+      <div class="mb-3">
+        <i class="fa-solid fa-magnifying-glass-minus fa-3x text-muted opacity-50"></i>
+      </div>
+      <h5>Tidak ditemukan</h5>
+      <p>Coba kata kunci atau filter lain.</p>
+    </div>
+
+  </main>
+
+  <!-- Modal Detail -->
   <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content bg-dark text-light">
-        <div class="modal-header">
-          <h5 id="modalTitle" class="modal-title"></h5>
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold pe-3" id="modalTitle">Judul Anime</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body d-flex gap-3 flex-column flex-md-row">
-          <div style="min-width:180px;max-width:240px;">
-            <div class="cover-wrap"><img id="modalCover" src="" alt="Cover"></div>
-          </div>
-          <div>
-            <p class="small-muted mb-1"><i class="fa-regular fa-calendar"></i> Terakhir ditonton: <span id="modalLastWatched"></span></p>
-            <p class="small-muted mb-2"><i class="fa-solid fa-list-ol"></i> Season: <span id="modalSeasons"></span> · Status: <span id="modalStatus"></span></p>
-            <h6>Sinopsis</h6>
-            <p id="modalSynopsis" style="color:#dbeeff; white-space:pre-line;"></p>
-            <button id="readMoreBtn" class="btn btn-sm btn-outline-light mt-2 d-none">Baca selengkapnya</button>
+        <div class="modal-body">
+          <div class="row g-4">
+            <div class="col-md-4 text-center text-md-start">
+              <img id="modalCover" src="" class="modal-cover mb-3" alt="Cover">
+              <div class="d-grid gap-2">
+                <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 text-center">
+                  <small class="d-block text-muted text-uppercase" style="font-size:0.7rem">Status</small>
+                  <span id="modalStatus" class="fw-bold text-white">-</span>
+                </div>
+                <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 text-center">
+                  <small class="d-block text-muted text-uppercase" style="font-size:0.7rem">Total Season</small>
+                  <span id="modalSeasons" class="fw-bold text-white">-</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="mb-3">
+                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
+                    <i class="fa-regular fa-clock me-1"></i> Terakhir: <span id="modalLastWatched">-</span>
+                 </span>
+              </div>
+              
+              <h6 class="text-uppercase text-muted fw-bold small ls-1">Sinopsis</h6>
+              <div class="bg-black bg-opacity-25 p-3 rounded-3 border border-white border-opacity-10">
+                <p id="modalSynopsis" class="mb-0 text-light" style="white-space: pre-line; line-height: 1.6; font-size: 0.95rem;">-</p>
+              </div>
+              
+              <div class="mt-4 p-3 rounded-3" style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary);">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                    <i class="fa-solid fa-tv text-white"></i>
+                  </div>
+                  <div>
+                    <div class="small text-muted text-uppercase fw-bold">Progress Saat Ini</div>
+                    <div class="fw-bold fs-5 text-white">Season <span id="modalSeasonNow">1</span> &mdash; Episode <span id="modalEpNow">1</span></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container">
+    <div id="liveToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">
+          Hello, world! This is a toast message.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
     </div>
   </div>
@@ -259,183 +424,281 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmlmRck6I6kwKfjeZCN7MapTP9YxGOoRIfa45RiSVS0cfUZh0WGDT99w4D2XcO6xjpW73NPgQczyCx/pub?output=csv';
-
-    const grid = document.getElementById('grid');
-    const searchInput = document.getElementById('search');
-    const clearSearch = document.getElementById('clearSearch');
-    const filterLabel = document.getElementById('filterLabel');
-    const lastUpdatedEl = document.getElementById('lastUpdated');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const emptyEl = document.getElementById('empty');
-
-    const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-    const modalTitle = document.getElementById('modalTitle');
-    const modalCover = document.getElementById('modalCover');
-    const modalSynopsis = document.getElementById('modalSynopsis');
-    const modalLastWatched = document.getElementById('modalLastWatched');
-    const modalSeasons = document.getElementById('modalSeasons');
-    const modalStatus = document.getElementById('modalStatus');
-
-    const readMoreBtn = document.getElementById('readMoreBtn');
-
-    // Placeholder SVG (base64 encoded)
-    const PLACEHOLDER_SVG = 'data:image/svg+xml;utf8,' +
-      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600">
-        <rect width="100%" height="100%" fill="#0b1220"/>
-        <text x="50%" y="50%" fill="#9fb3d9" font-size="30" text-anchor="middle" dominant-baseline="middle">No Image</text>
-      </svg>`);
-
-    // Jika gambar modal gagal dimuat, fallback ke placeholder
-    modalCover.onerror = function(){
-      if (this.src !== PLACEHOLDER_SVG) this.src = PLACEHOLDER_SVG;
+    // --- Config ---
+    const CONFIG = {
+      CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmlmRck6I6kwKfjeZCN7MapTP9YxGOoRIfa45RiSVS0cfUZh0WGDT99w4D2XcO6xjpW73NPgQczyCx/pub?output=csv',
+      PLACEHOLDER_IMG: `data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='100%25' height='100%25' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' fill='%23475569' font-size='20' text-anchor='middle' font-family='sans-serif'%3ENO IMAGE%3C/text%3E%3C/svg%3E`
     };
 
-    let rawData = [];
-    let currentFilter = 'all';
-    let currentQuery = '';
+    // --- State Management ---
+    const state = {
+      allData: [],
+      displayedData: [],
+      filter: 'all', // all, ongoing, selesai
+      sort: 'latest', // latest, az, za
+      searchQuery: '',
+      itemsPerPage: 20,
+      currentPage: 1
+    };
 
-    async function loadData(){
-      lastUpdatedEl.textContent = 'Memuat...';
-      try{
-        const res = await fetch(CSV_URL, {cache:'no-store'});
-        const txt = await res.text();
-        rawData = csvToObjects(txt);
-        lastUpdatedEl.textContent = new Date().toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
-        applyFiltersAndRender();
-      }catch(e){
-        console.error(e);
-        lastUpdatedEl.textContent = 'Gagal memuat data';
-      }
-    }
+    // --- DOM Elements ---
+    const els = {
+      grid: document.getElementById('grid'),
+      empty: document.getElementById('emptyState'),
+      searchInput: document.getElementById('searchInput'),
+      clearSearch: document.getElementById('clearSearch'),
+      totalCount: document.getElementById('totalCount'),
+      ongoingCount: document.getElementById('ongoingCount'),
+      lastUpdated: document.getElementById('lastUpdated'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      filterLabel: document.getElementById('filterLabel'),
+      sortLabel: document.getElementById('sortLabel'),
+      toastEl: document.getElementById('liveToast'),
+      toastMsg: document.getElementById('toastMessage'),
+      loadMoreContainer: document.getElementById('loadMoreContainer'),
+      loadMoreBtn: document.getElementById('loadMoreBtn'),
+      showingCount: document.getElementById('showingCount'),
+      totalVisibleCount: document.getElementById('totalVisibleCount')
+    };
 
-    function csvToObjects(csv){
-      const parsed = Papa.parse(csv, {header:true, skipEmptyLines:true});
-      return parsed.data.map(r => ({
-        'Cover': r['Cover'] || '',
-        'Judul Anime': r['Judul Anime'] || r['Judul'] || '',
-        'Sinopsis': r['Sinopsis'] || '',
-        'Jumlah Season': r['Jumlah Season'] || '',
-        'Status': r['Status'] || '',
-        'Season Sedang Nonton': r['Season Sedang Nonton'] || '',
-        'Episode Sedang Nonton': r['Episode Sedang Nonton'] || '',
-        'Terakhir Ditonton': r['Terakhir Ditonton'] || ''
-      }));
-    }
-
-    function buildCard(item){
-      let cover = (item['Cover'] || '').trim();
-      if (!cover || cover.toLowerCase() === 'null' || cover.toLowerCase() === 'undefined') {
-        cover = PLACEHOLDER_SVG;
-      }
-
-      const title = item['Judul Anime'] || 'Tanpa Judul';
-      const status = item['Status'] || 'Tidak Diketahui';
-      let sinopsis = item['Sinopsis'] || 'Tidak ada sinopsis.';
-      if (sinopsis.length > 400) {
-        sinopsis = sinopsis.substring(0, 400).trim() + '...';
-      }
-      const seasons = item['Jumlah Season'] || '-';
-      const seasonNow = item['Season Sedang Nonton'] || '-';
-      const episodeNow = item['Episode Sedang Nonton'] || '-';
-      const lastWatched = item['Terakhir Ditonton'] || '-';
-
-      const card = document.createElement('div');
-      card.className = 'anime-card';
-      card.innerHTML = `
-        <div class="cover-wrap">
-          <img src="${cover}" alt="${title}" loading="lazy"
-            onerror="this.onerror=null;this.src='${PLACEHOLDER_SVG}';">
-        </div>
-        <div class="card-body">
-          <span class="title">${title}</span>
-          <div class="meta">
-            <div class="badge-status ${status.toLowerCase()==='ongoing'?'status-ongoing':'status-finished'}">${status}</div>
-            <div class="small-muted"><i class="fa-solid fa-clapperboard"></i> ${seasons} season</div>
-          </div>
-          <div class="progress-line">
-            <div class="progress-text"><i class="fa-solid fa-play"></i> Season ${seasonNow} · Episode ${episodeNow}</div>
-            <div class="small-muted"><i class="fa-regular fa-calendar"></i> ${lastWatched}</div>
-          </div>
-        </div>
-      `;
-
-      card.querySelector('.cover-wrap').addEventListener('click', () => {
-      modalTitle.textContent = title;
-      modalCover.src = cover || PLACEHOLDER_SVG;
-
-      const fullText = item['Sinopsis'] || 'Tidak ada sinopsis.';
-      const shortText = fullText.length > 400 ? fullText.substring(0, 400).trim() + '...' : fullText;
-
-      modalSynopsis.innerHTML = shortText.replace(/<br\s*\/?>/gi, '<br><br>');
-
-      // Tampilkan tombol hanya jika sinopsis panjang
-      if (fullText.length > 400) {
-        readMoreBtn.classList.remove('d-none');
-        let expanded = false;
-
-        readMoreBtn.textContent = 'Baca selengkapnya';
-        readMoreBtn.onclick = () => {
-          expanded = !expanded;
-          modalSynopsis.innerHTML = (expanded ? fullText : shortText).replace(/<br\s*\/?>/gi, '<br><br>');
-          readMoreBtn.textContent = expanded ? 'Tutup' : 'Baca selengkapnya';
-        };
-      } else {
-        readMoreBtn.classList.add('d-none');
-      }
-
-      modalLastWatched.textContent = lastWatched;
-      modalSeasons.textContent = seasons;
-      modalStatus.textContent = status;
-
-      detailModal.show();
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      initEventListeners();
+      fetchData();
     });
 
+    // --- Data Fetching ---
+    async function fetchData() {
+      showSkeleton();
+      els.lastUpdated.textContent = 'Updating...';
+      
+      try {
+        const response = await fetch(CONFIG.CSV_URL, { cache: 'no-store' });
+        if(!response.ok) throw new Error("Network Error");
+        
+        const csvText = await response.text();
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+        
+        // Transform keys to safer object structure
+        state.allData = parsed.data.map(item => ({
+          title: sanitize(item['Judul Anime'] || item['Judul']),
+          cover: (item['Cover'] || '').trim(),
+          synopsis: sanitize(item['Sinopsis']),
+          seasons: sanitize(item['Jumlah Season']),
+          status: sanitize(item['Status']),
+          seasonNow: sanitize(item['Season Sedang Nonton']),
+          epNow: sanitize(item['Episode Sedang Nonton']),
+          lastWatched: sanitize(item['Terakhir Ditonton'])
+        }));
 
-      return card;
+        state.allData.reverse(); // Default raw order (newest input usually at bottom)
+        
+        updateUI();
+        els.lastUpdated.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute:'2-digit' });
+        showToast("Data berhasil diperbarui!");
+
+      } catch (error) {
+        console.error(error);
+        els.grid.innerHTML = `<div class="col-12 text-center text-danger p-5">Gagal memuat data. Periksa koneksi internet.</div>`;
+        showToast("Gagal memuat data", true);
+      }
     }
 
-    function renderGrid(list){
-      grid.innerHTML='';
-      if(!list.length){emptyEl.classList.remove('d-none');return;}
-      emptyEl.classList.add('d-none');
-      const frag=document.createDocumentFragment();
-      list.forEach(item=>frag.appendChild(buildCard(item)));
-      grid.appendChild(frag);
+    // --- Logic Core ---
+    function updateUI() {
+      // 1. Filtering
+      let processed = state.allData.filter(item => {
+        const matchStatus = state.filter === 'all' 
+          ? true 
+          : item.status.toLowerCase() === state.filter;
+        const matchSearch = item.title.toLowerCase().includes(state.searchQuery.toLowerCase());
+        return matchStatus && matchSearch;
+      });
+
+      // 2. Sorting
+      if (state.sort === 'az') {
+        processed.sort((a, b) => a.title.localeCompare(b.title));
+      } else if (state.sort === 'za') {
+        processed.sort((a, b) => b.title.localeCompare(a.title));
+      } else {
+        // 'latest' assumes original array order (reversed in fetch) matches 'recently added'
+        // or we could specific logic if a date field existed.
+        // Keeping filtered array order.
+      }
+
+      state.displayedData = processed;
+      state.currentPage = 1; // Reset to first page when filtering/sorting
+
+      // 3. Render
+      renderStats();
+      renderGrid(true); // true means RESET grid (clear existing items)
     }
 
-    function applyFiltersAndRender(){
-      let data = [...rawData];
-      if (currentFilter !== 'all') 
-        data = data.filter(r => r['Status'].toLowerCase() === currentFilter.toLowerCase());
-      if (currentQuery.trim()) 
-        data = data.filter(r => r['Judul Anime'].toLowerCase().includes(currentQuery.toLowerCase()));
-
-      // Hitung total dan ongoing
-      const total = rawData.length;
-      const ongoing = rawData.filter(r => (r['Status'] || '').toLowerCase() === 'ongoing').length;
-
-      // Update tampilan jumlah
-      document.getElementById('totalCount').textContent = total;
-      document.getElementById('ongoingCount').textContent = ongoing;
-
-      data.reverse();
-      renderGrid(data);
-
-      renderGrid(data);
+    // --- Rendering ---
+    function showSkeleton() {
+      els.grid.innerHTML = Array(6).fill(0).map(() => 
+        `<div class="skeleton skeleton-card"></div>`
+      ).join('');
+      els.empty.classList.add('d-none');
+      els.loadMoreContainer.classList.add('d-none');
     }
 
-    searchInput.addEventListener('input',e=>{currentQuery=e.target.value;applyFiltersAndRender();});
-    clearSearch.addEventListener('click',()=>{searchInput.value='';currentQuery='';applyFiltersAndRender();});
-    document.querySelectorAll('.filter-item').forEach(el=>el.addEventListener('click',e=>{
-      e.preventDefault();currentFilter=el.dataset.filter;filterLabel.textContent=currentFilter==='all'?'Semua':currentFilter;applyFiltersAndRender();
-    }));
-    refreshBtn.addEventListener('click',()=>loadData());
+    function renderGrid(isReset = false) {
+      if (isReset) {
+        els.grid.innerHTML = '';
+      }
+      
+      if (state.displayedData.length === 0) {
+        els.empty.classList.remove('d-none');
+        els.loadMoreContainer.classList.add('d-none');
+        return;
+      }
+      
+      els.empty.classList.add('d-none');
 
-    loadData();
+      // Pagination Logic
+      const start = isReset ? 0 : (state.currentPage - 1) * state.itemsPerPage;
+      const end = state.currentPage * state.itemsPerPage;
+      const itemsToShow = state.displayedData.slice(start, end);
 
-    // update manual di sini tiap revisi
-    document.getElementById('version').textContent = 'v1.0.1'; 
+      const fragment = document.createDocumentFragment();
+
+      itemsToShow.forEach(item => {
+        const card = document.createElement('div');
+        // Prevent generic image errors
+        const imgUrl = (item.cover && item.cover.length > 5) ? item.cover : CONFIG.PLACEHOLDER_IMG;
+        const isOngoing = item.status.toLowerCase() === 'ongoing';
+
+        card.innerHTML = `
+          <div class="anime-card h-100">
+            <div class="card-img-wrapper">
+              <img src="${imgUrl}" alt="${item.title}" loading="lazy" onerror="this.src='${CONFIG.PLACEHOLDER_IMG}'">
+              <span class="card-badge ${isOngoing ? 'status-ongoing' : 'status-finished'}">
+                ${item.status || 'Unknown'}
+              </span>
+            </div>
+            <div class="card-content">
+              <div class="card-title" title="${item.title}">${item.title}</div>
+              <div class="card-meta">
+                <i class="fa-solid fa-layer-group me-1"></i> ${item.seasons || '?'} Season
+              </div>
+              <div class="progress-pill">
+                <i class="fa-solid fa-circle-play"></i>
+                <span>S${item.seasonNow} / Ep${item.epNow}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Attach Click Event for Modal
+        card.querySelector('.anime-card').addEventListener('click', () => openModal(item));
+        fragment.appendChild(card);
+      });
+
+      els.grid.appendChild(fragment);
+
+      // Handle Load More Visibility
+      const displayedCount = Math.min(end, state.displayedData.length);
+      els.showingCount.textContent = displayedCount;
+      els.totalVisibleCount.textContent = state.displayedData.length;
+
+      if (state.displayedData.length > end) {
+        els.loadMoreContainer.classList.remove('d-none');
+      } else {
+        els.loadMoreContainer.classList.add('d-none');
+      }
+    }
+
+    function renderStats() {
+      els.totalCount.textContent = state.allData.length;
+      els.ongoingCount.textContent = state.allData.filter(i => i.status.toLowerCase() === 'ongoing').length;
+    }
+
+    // --- Modal Logic ---
+    const modalEl = new bootstrap.Modal(document.getElementById('detailModal'));
+    
+    function openModal(item) {
+      document.getElementById('modalTitle').textContent = item.title;
+      const coverEl = document.getElementById('modalCover');
+      coverEl.src = (item.cover && item.cover.length > 5) ? item.cover : CONFIG.PLACEHOLDER_IMG;
+      
+      document.getElementById('modalStatus').textContent = item.status;
+      document.getElementById('modalSeasons').textContent = item.seasons;
+      document.getElementById('modalLastWatched').textContent = item.lastWatched || '-';
+      document.getElementById('modalSeasonNow').textContent = item.seasonNow || '?';
+      document.getElementById('modalEpNow').textContent = item.epNow || '?';
+      
+      const synopsis = item.synopsis || "Belum ada sinopsis.";
+      document.getElementById('modalSynopsis').textContent = synopsis;
+
+      modalEl.show();
+    }
+
+    // --- Event Listeners ---
+    function initEventListeners() {
+      // Search
+      els.searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        updateUI();
+      });
+      els.clearSearch.addEventListener('click', () => {
+        els.searchInput.value = '';
+        state.searchQuery = '';
+        updateUI();
+      });
+
+      // Filters
+      document.querySelectorAll('.filter-opt').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          state.filter = e.target.dataset.filter;
+          els.filterLabel.textContent = e.target.textContent.replace(/[^a-zA-Z]/g, "").trim(); // Remove icon
+          updateUI();
+        });
+      });
+
+      // Sort
+      document.querySelectorAll('.sort-opt').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          state.sort = e.target.dataset.sort;
+          els.sortLabel.textContent = e.target.textContent.replace(/[^a-zA-Z]/g, "").trim();
+          updateUI();
+        });
+      });
+
+      // Refresh
+      els.refreshBtn.addEventListener('click', fetchData);
+
+      // Load More
+      els.loadMoreBtn.addEventListener('click', () => {
+        state.currentPage++;
+        renderGrid(false); // false means append (don't clear grid)
+      });
+    }
+
+    // --- Utilities ---
+    function sanitize(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(msg, isError = false) {
+      els.toastMsg.textContent = msg;
+      const toastEl = document.getElementById('liveToast');
+      if(isError) {
+        toastEl.classList.remove('text-bg-primary');
+        toastEl.classList.add('text-bg-danger');
+      } else {
+        toastEl.classList.remove('text-bg-danger');
+        toastEl.classList.add('text-bg-primary');
+      }
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    }
+
   </script>
 </body>
 </html>
